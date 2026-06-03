@@ -1,7 +1,7 @@
 import { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.alnoorway.app", // تأكد إن ده الـ Bundle ID في Apple Developer
+  appId: "com.alnoorway.codexus.app", // تأكد إن ده الـ Bundle ID في Apple Developer
   appName: "Alnoorway",
   webDir: "dist",
   server: {
