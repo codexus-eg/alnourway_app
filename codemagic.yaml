@@ -9,6 +9,10 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.alnoorway.codexus.app
+        provisioning_profiles:
+          - ios_profile_manual
+        certificates:
+          - ios_cert_manual
       vars:
         XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
