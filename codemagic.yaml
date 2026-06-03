@@ -7,8 +7,6 @@ workflows:
       app_store_connect: noourway
     environment:
       ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.alnoorway.codexus.app
         provisioning_profiles:
           - ios_profile_manual
         certificates:
