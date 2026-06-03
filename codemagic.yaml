@@ -1,0 +1,47 @@
+workflows:
+  ios-alnoorway-auto:
+    name: AlNoorway iOS Auto Flow
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: noourway
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.alnoorway.app
+      vars:
+        XCODE_PROJECT: "ios/App/App.xcodeproj"
+        XCODE_SCHEME: "App"
+        APP_ID: "6762559077" # اتأكدت إن ده الـ Apple ID الجديد بتاعك
+      node: latest
+      xcode: latest
+    scripts:
+      - name: Install dependencies
+        script: npm install
+      - name: Build web app and Sync
+        script: |
+          npm run build
+          npx cap sync ios
+      - name: Set up code signing
+        script: xcode-project use-profiles
+      - name: Build ipa for distribution
+        script: |
+          xcode-project build-ipa \
+            --project "$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME"
+      - name: Publish to App Store Connect
+        script: |
+          # البحث عن ملف الـ IPA
+          IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -n 1)
+          
+          # الرفع فقط للسيرفر بدون طلب مراجعة أوتوماتيكي
+          app-store-connect publish \
+            --path "$IPA_PATH" \
+            --apple-id "$APP_ID"
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      email:
+        recipients:
+          - osakr100@gmail.com
+          - ahmedmustafa0384@gmail.com
