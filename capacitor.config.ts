@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: "dist",
   server: {
     androidScheme: "https",
-    iosScheme: "com.alnoorway.app", // خليه نفس الـ App ID عشان الـ Deep Linking
+    iosScheme: "com.alnoorway.codexus.app", // خليه نفس الـ App ID عشان الـ Deep Linking
   },
   plugins: {
     GoogleAuth: {
