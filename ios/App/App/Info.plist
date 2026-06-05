@@ -28,21 +28,21 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
 
-    <!-- ✅ Version (Marketing Version) -->
     <key>CFBundleShortVersionString</key>
     <string>1.0.1</string>
 
-    <!-- ✅ Build Number (تم رفعه إلى 7) -->
     <key>CFBundleVersion</key>
-    <string>7</string>
+    <string>9</string>
 
-    <!-- ✅ تحديد دعم الآيفون فقط وإلغاء الآيباد -->
     <key>UIDeviceFamily</key>
     <array>
         <integer>1</integer>
     </array>
 
     <key>LSRequiresIPhoneOS</key>
+    <true />
+
+    <key>UIRequiresFullScreen</key>
     <true />
 
     <key>UILaunchStoryboardName</key>
@@ -59,6 +59,7 @@
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
