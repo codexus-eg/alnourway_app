@@ -1,17 +1,16 @@
 import { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.alnoorway.codexus.app", // تأكد إن ده الـ Bundle ID في Apple Developer
+  appId: "com.alnoorway.codexus.app",
   appName: "Alnoorway",
   webDir: "dist",
   server: {
     androidScheme: "https",
-    iosScheme: "com.alnoorway.codexus.app", // خليه نفس الـ App ID عشان الـ Deep Linking
+    iosScheme: "https", // ✅ تم التعديل هنا: يجب أن يكون https لكي يقبل السيرفر إرسال البيانات (CORS)
   },
   plugins: {
     GoogleAuth: {
       scopes: ["profile", "email"],
-      // الـ Client IDs دي بتجيبها من Google Cloud Console
       iosClientId:
         "829658324868-lrbdqm9ekjpaunpaecm4bk4stn16ifte.apps.googleusercontent.com",
       serverClientId:
