@@ -6,15 +6,11 @@ workflows:
     integrations:
       app_store_connect: noourway
 
-    # ✅ استخدام قسم ios_signing الرسمي من Codemagic للتوقيع التلقائي
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.alnoorway.codexus.app
       vars:
-        # ✅ استخدام Workspace بدلاً من Project لتجنب أخطاء بناء Capacitor
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
+        BUNDLE_ID: "com.alnoorway.codexus.app"
         APP_ID: "6762559077"
       node: latest
       xcode: latest
@@ -28,8 +24,17 @@ workflows:
           npm run build
           npx cap sync ios
 
-      - name: Set up code signing
-        script: xcode-project use-profiles
+      - name: Create and Setup Code Signing
+        script: |
+          # 1. إنشاء وسحب الشهادات والبروفايل الجديد من أبل
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+
+          # 2. حفظ الشهادة الجديدة في سيرفر الماك عشان Xcode يقدر يشوفها (الخطوة اللي كانت ناقصة)
+          keychain initialize
+          keychain add-certificates
+
+          # 3. ربط الشهادة بملف المشروع
+          xcode-project use-profiles
 
       - name: Build ipa for distribution
         script: |
