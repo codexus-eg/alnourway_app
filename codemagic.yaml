@@ -1,52 +1,52 @@
 workflows:
-  ios-alnoorway-auto:
-    name: AlNoorway iOS Auto Flow
+  ios-alnoorway-manual:
+    name: AlNoorway iOS Manual Flow
     max_build_duration: 120
     instance_type: mac_mini_m2
     integrations:
       app_store_connect: noourway
+
     environment:
+      # ✅ ربط الشهادات اليدوية اللي رفعناها
+      ios_signing:
+        provisioning_profiles:
+          - ios_profile_manual
+        certificates:
+          - ios_cert_manual
       vars:
         XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
-        BUNDLE_ID: "com.alnoorway.codexus.app"
         APP_ID: "6762559077"
       node: latest
       xcode: latest
+
     scripts:
       - name: Install dependencies
         script: npm install --legacy-peer-deps
-      - name: Build web app
-        script: npm run build
-      - name: Sync Capacitor
+
+      - name: Build web app and Sync
         script: |
+          npm run build
           npx cap sync ios
-      - name: Install Pods
-        script: |
-          # نتحرك للمجلد اللي فيه الـ Podfile اللي الـ Sync كريتته
-          cd ios/App
-          pod install
+
       - name: Set up code signing
-        script: |
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
-          keychain initialize
-          keychain add-certificates
-          xcode-project use-profiles
+        script: xcode-project use-profiles
+
       - name: Build ipa for distribution
         script: |
           xcode-project build-ipa \
             --project "$XCODE_PROJECT" \
             --scheme "$XCODE_SCHEME"
+
       - name: Publish to App Store Connect
         script: |
           IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -n 1)
           app-store-connect publish \
             --path "$IPA_PATH" \
             --apple-id "$APP_ID"
+
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
       email:
-        recipients:
-          - osakr100@gmail.com
-          - ahmedmustafa0384@gmail.com
+        recipients: -codexus.eg@gmail.com
