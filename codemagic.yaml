@@ -49,4 +49,5 @@ workflows:
       - build/ios/ipa/*.ipa
     publishing:
       email:
-        recipients: -codexus.eg@gmail.com
+        recipients:
+          - codexus.eg@gmail.com
