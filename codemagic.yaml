@@ -7,7 +7,6 @@ workflows:
       app_store_connect: noourway
     environment:
       vars:
-        # ✅ نستخدم XCODE_PROJECT بدلاً من Workspace لحل مشكلة "Path does not exist"
         XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
         BUNDLE_ID: "com.alnoorway.codexus.app"
@@ -17,17 +16,18 @@ workflows:
     scripts:
       - name: Install dependencies
         script: npm install --legacy-peer-deps
-      - name: Build web app and Sync
+      - name: Build web app
+        script: npm run build
+      - name: Sync Capacitor
         script: |
-          npm run build
           npx cap sync ios
       - name: Install Pods
         script: |
+          # نتحرك للمجلد اللي فيه الـ Podfile اللي الـ Sync كريتته
           cd ios/App
           pod install
       - name: Set up code signing
         script: |
-          # هذه الأوامر تقوم بإنشاء الشهادات والبروفايل تلقائياً وربطها بالمشروع
           app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
           keychain initialize
           keychain add-certificates
