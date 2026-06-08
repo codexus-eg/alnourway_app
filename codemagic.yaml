@@ -5,50 +5,44 @@ workflows:
     instance_type: mac_mini_m2
     integrations:
       app_store_connect: noourway
-
     environment:
       vars:
-        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
+        # ✅ نستخدم XCODE_PROJECT بدلاً من Workspace لحل مشكلة "Path does not exist"
+        XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
         BUNDLE_ID: "com.alnoorway.codexus.app"
         APP_ID: "6762559077"
       node: latest
       xcode: latest
-
     scripts:
       - name: Install dependencies
         script: npm install --legacy-peer-deps
-
       - name: Build web app and Sync
         script: |
           npm run build
           npx cap sync ios
-
-      - name: Create and Setup Code Signing
+      - name: Install Pods
         script: |
-          # 1. إنشاء وسحب الشهادات والبروفايل الجديد من أبل
+          cd ios/App
+          pod install
+      - name: Set up code signing
+        script: |
+          # هذه الأوامر تقوم بإنشاء الشهادات والبروفايل تلقائياً وربطها بالمشروع
           app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
-
-          # 2. حفظ الشهادة الجديدة في سيرفر الماك عشان Xcode يقدر يشوفها (الخطوة اللي كانت ناقصة)
           keychain initialize
           keychain add-certificates
-
-          # 3. ربط الشهادة بملف المشروع
           xcode-project use-profiles
-
       - name: Build ipa for distribution
         script: |
           xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
+            --project "$XCODE_PROJECT" \
             --scheme "$XCODE_SCHEME"
-
       - name: Publish to App Store Connect
         script: |
           IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -n 1)
           app-store-connect publish \
             --path "$IPA_PATH" \
             --apple-id "$APP_ID"
-
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
