@@ -6,15 +6,11 @@ workflows:
     integrations:
       app_store_connect: noourway
     environment:
-      ios_signing:
-        provisioning_profiles:
-          - ios_profile_manual
-        certificates:
-          - ios_cert_manual
       vars:
         XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
-        APP_ID: "6762559077" # اتأكدت إن ده الـ Apple ID الجديد بتاعك
+        APP_ID: "6762559077"
+        BUNDLE_ID: "com.alnoorway.codexus.app"
       node: latest
       xcode: latest
     scripts:
@@ -24,8 +20,11 @@ workflows:
         script: |
           npm run build
           npx cap sync ios
-      - name: Set up code signing
-        script: xcode-project use-profiles
+      - name: Automatic Code Signing
+        script: |
+          # السطر ده هيكريت الشهادات والبروفايل تلقائياً من أبل
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+          xcode-project use-profiles
       - name: Build ipa for distribution
         script: |
           xcode-project build-ipa \
@@ -33,10 +32,7 @@ workflows:
             --scheme "$XCODE_SCHEME"
       - name: Publish to App Store Connect
         script: |
-          # البحث عن ملف الـ IPA
           IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -n 1)
-
-          # الرفع فقط للسيرفر بدون طلب مراجعة أوتوماتيكي
           app-store-connect publish \
             --path "$IPA_PATH" \
             --apple-id "$APP_ID"
