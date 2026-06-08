@@ -1,25 +1,27 @@
-import { createClient } from '@supabase/supabase-js';
+// @ts-nocheck
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder';
+// ✅ تم وضع الرابط الحقيقي
+const supabaseUrl = "https://raxudhplkjawspqajjqu.supabase.co";
 
-if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-  console.warn("Supabase credentials missing. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
-}
+// ✅ تم وضع المفتاح الحقيقي
+const supabaseAnonKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJheHVkaHBsa2phd3NwcWFqanF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0NTg1NTAsImV4cCI6MjA4MDAzNDU1MH0.WWa3P3qA6ZVhifVmATIJvKAS1KO9-zqrZe5YoN7xX48";
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const supabaseRedirectTo = import.meta.env.VITE_SUPABASE_REDIRECT_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+const supabaseRedirectTo =
+  typeof window !== "undefined" ? window.location.origin : "";
 
 export const signInWithProvider = async (provider) => {
   return supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: 'com.alnoorway.tareeqalnoor://home',
-      skipBrowserRedirect: false
+      redirectTo: "com.alnoorway.tareeqalnoor://home",
+      skipBrowserRedirect: false,
     },
   });
 };
 
-export const signInWithGoogle = () => signInWithProvider('google');
-export const signInWithApple = () => signInWithProvider('apple');
+export const signInWithGoogle = () => signInWithProvider("google");
+export const signInWithApple = () => signInWithProvider("apple");
