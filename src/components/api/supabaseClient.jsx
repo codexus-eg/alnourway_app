@@ -14,6 +14,16 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const supabaseRedirectTo =
   typeof window !== "undefined" ? window.location.origin : "";
 
+// ✅ 1. التهيئة الإجبارية لجوجل (بدونها يظهر الخطأ الأحمر)
+if (Capacitor.isNativePlatform()) {
+  GoogleAuth.initialize({
+    clientId:
+      "13323553855-050m4n3foiebcmpilpcdmojpp80b8666.apps.googleusercontent.com",
+    scopes: ["profile", "email"],
+    grantOfflineAccess: true,
+  });
+}
+
 // --- تسجيل الدخول بـ Google ---
 export const signInWithGoogle = async () => {
   if (Capacitor.isNativePlatform()) {
