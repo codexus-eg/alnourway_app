@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Loader2 } from "lucide-react";
-// ✅ استدعاء المكتبة الجديدة هنا
-import { GoogleSignIn } from "@capawesome/capacitor-google-sign-in";
+// ✅ استدعاء المكتبة الجديدة المتوافقة مع إصدارك
+import { SocialLogin } from "@capgo/capacitor-social-login";
 import { SignInWithApple } from "@capacitor-community/apple-sign-in";
 import { Capacitor } from "@capacitor/core";
 
@@ -21,21 +21,24 @@ export default function AuthPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // تهيئة جوجل للموبايل فقط باستخدام المكتبة الجديدة والمفتاح الخاص بـ iOS
+    // تهيئة جوجل باستخدام المكتبة الجديدة والمفاتيح الخاصة بك
     if (Capacitor.isNativePlatform()) {
-      GoogleSignIn.initialize({
-        clientId:
-          "13323553855-050m4n3foiebcmpilpcdmojpp80b8666.apps.googleusercontent.com",
-        scopes: ["profile", "email"],
+      SocialLogin.initialize({
+        google: {
+          webClientId:
+            "829658324868-lrbdqm9ekjpaunpaecm4bk4stn16ifte.apps.googleusercontent.com",
+          iOSClientId:
+            "13323553855-050m4n3foiebcmpilpcdmojpp80b8666.apps.googleusercontent.com",
+          mode: "online",
+        },
       });
     }
   }, []);
 
   const performUnifiedAuth = async (provider) => {
     setLoading(true);
-    const platform = Capacitor.getPlatform(); // 'ios' | 'android' | 'web'
+    const platform = Capacitor.getPlatform();
     try {
-      // 1. التعامل مع الويب (Web)
       if (platform === "web") {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: provider,
@@ -45,20 +48,21 @@ export default function AuthPage() {
         return;
       }
 
-      // 2. تسجيل الدخول بجوجل (Native Android & iOS)
       if (provider === "google") {
-        // ✅ استخدام دوال المكتبة الجديدة
-        const googleUser = await GoogleSignIn.signIn();
-        const { data, error } = await supabase.auth.signInWithIdToken({
-          provider: "google",
-          // المكتبة الجديدة بترجع idToken مباشرة مش جوه authentication
-          token: googleUser.idToken,
-        });
-        if (error) throw error;
-        handleSuccess();
+        const googleUser = await SocialLogin.login({ provider: "google" });
+        // المكتبة بترجع الـ idToken جوه result
+        if (googleUser.result && googleUser.result.idToken) {
+          const { error } = await supabase.auth.signInWithIdToken({
+            provider: "google",
+            token: googleUser.result.idToken,
+          });
+          if (error) throw error;
+          handleSuccess();
+        } else {
+          throw new Error("No ID token found");
+        }
       }
 
-      // 3. تسجيل الدخول بآبل (Native iOS فقط)
       if (provider === "apple") {
         if (platform === "ios") {
           const appleResult = await SignInWithApple.authorize({
@@ -68,7 +72,7 @@ export default function AuthPage() {
             scopes: "email name",
           });
 
-          const { data, error } = await supabase.auth.signInWithIdToken({
+          const { error } = await supabase.auth.signInWithIdToken({
             provider: "apple",
             token: appleResult.response.identityToken,
           });
