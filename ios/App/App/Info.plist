@@ -32,7 +32,7 @@
     <string>1.0.1</string>
 
     <key>CFBundleVersion</key>
-    <string>15</string>
+    <string>16</string>
 
     <key>UIDeviceFamily</key>
     <array>
@@ -100,5 +100,8 @@
 			</array>
 		</dict>
 	</array>
+    <key>GIDClientID</key>
+	<string
+    >13323553855-050m4n3foiebcmpilpcdmojpp80b8666.apps.googleusercontent.com</string>
 </dict>
 </plist>
