@@ -11,8 +11,10 @@ const config: CapacitorConfig = {
   plugins: {
     GoogleAuth: {
       scopes: ["profile", "email"],
+      // المفتاح الجديد الخاص بـ iOS
       iosClientId:
-        "829658324868-lrbdqm9ekjpaunpaecm4bk4stn16ifte.apps.googleusercontent.com",
+        "13323553855-050m4n3foiebcmpilpcdmojpp80b8666.apps.googleusercontent.com",
+      // مفتاح الويب القديم الخاص بـ السيرفر (Supabase)
       serverClientId:
         "829658324868-lrbdqm9ekjpaunpaecm4bk4stn16ifte.apps.googleusercontent.com",
       forceCodeForRefreshToken: true,

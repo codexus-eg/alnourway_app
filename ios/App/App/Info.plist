@@ -32,7 +32,7 @@
     <string>1.0.1</string>
 
     <key>CFBundleVersion</key>
-    <string>12</string>
+    <string>13</string>
 
     <key>UIDeviceFamily</key>
     <array>
@@ -96,7 +96,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string
-          >com.googleusercontent.apps.829658324868-lrbdqm9ekjpaunpaecm4bk4stn16ifte</string>
+          >com.googleusercontent.apps.13323553855-050m4n3foiebcmpilpcdmojpp80b8666</string>
 			</array>
 		</dict>
 	</array>
