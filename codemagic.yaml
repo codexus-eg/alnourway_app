@@ -7,7 +7,6 @@ workflows:
       app_store_connect: noourway
 
     environment:
-      # ✅ ربط الشهادات اليدوية اللي رفعناها
       ios_signing:
         provisioning_profiles:
           - ios_profile_manual
@@ -28,6 +27,14 @@ workflows:
         script: |
           npm run build
           npx cap sync ios
+
+      - name: Clean CocoaPods and Resolve SPM
+        script: |
+          cd ios/App
+          # مسح أي ملفات قديمة تسبب تعارض
+          rm -rf Podfile Podfile.lock Pods App.xcworkspace
+          # تحميل مكتبات جوجل وأبل بالنظام الجديد إجبارياً
+          xcodebuild -resolvePackageDependencies -project App.xcodeproj -scheme App
 
       - name: Set up code signing
         script: xcode-project use-profiles
