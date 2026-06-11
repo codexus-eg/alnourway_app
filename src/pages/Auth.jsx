@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Loader2 } from "lucide-react";
-import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth";
+// ✅ استدعاء المكتبة الجديدة هنا
+import { GoogleSignIn } from "@capawesome/capacitor-google-sign-in";
 import { SignInWithApple } from "@capacitor-community/apple-sign-in";
 import { Capacitor } from "@capacitor/core";
 
@@ -20,20 +21,18 @@ export default function AuthPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // تهيئة جوجل للموبايل فقط
+    // تهيئة جوجل للموبايل فقط باستخدام المكتبة الجديدة والمفتاح الخاص بـ iOS
     if (Capacitor.isNativePlatform()) {
-      GoogleAuth.initialize({
+      GoogleSignIn.initialize({
         clientId:
-          "829658324868-lrbdqm9ekjpaunpaecm4bk4stn16ifte.apps.googleusercontent.com",
+          "13323553855-050m4n3foiebcmpilpcdmojpp80b8666.apps.googleusercontent.com",
         scopes: ["profile", "email"],
-        grantOfflineAccess: true,
       });
     }
   }, []);
 
   const performUnifiedAuth = async (provider) => {
     setLoading(true);
-    // البديل الذكي لـ @capacitor/device هو استخدام Core مباشرة
     const platform = Capacitor.getPlatform(); // 'ios' | 'android' | 'web'
     try {
       // 1. التعامل مع الويب (Web)
@@ -48,10 +47,12 @@ export default function AuthPage() {
 
       // 2. تسجيل الدخول بجوجل (Native Android & iOS)
       if (provider === "google") {
-        const googleUser = await GoogleAuth.signIn();
+        // ✅ استخدام دوال المكتبة الجديدة
+        const googleUser = await GoogleSignIn.signIn();
         const { data, error } = await supabase.auth.signInWithIdToken({
           provider: "google",
-          token: googleUser.authentication.idToken,
+          // المكتبة الجديدة بترجع idToken مباشرة مش جوه authentication
+          token: googleUser.idToken,
         });
         if (error) throw error;
         handleSuccess();
@@ -61,7 +62,7 @@ export default function AuthPage() {
       if (provider === "apple") {
         if (platform === "ios") {
           const appleResult = await SignInWithApple.authorize({
-            clientId: "com.alnoorway.codexus.app", // تأكد من مطابقة الـ Bundle ID في Xcode
+            clientId: "com.alnoorway.codexus.app",
             redirectURI:
               "https://raxudhplkjawspqajjqu.supabase.co/auth/v1/callback",
             scopes: "email name",
@@ -74,7 +75,6 @@ export default function AuthPage() {
           if (error) throw error;
           handleSuccess();
         } else {
-          // أندرويد أو غيره يستخدم الويب لآبل
           const { error } = await supabase.auth.signInWithOAuth({
             provider: "apple",
             options: { redirectTo: window.location.origin },
