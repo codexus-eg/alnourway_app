@@ -348,7 +348,7 @@ export default function Profile() {
             <Button
               variant="destructive"
               className="w-full py-5 md:py-6 bg-red-600 hover:bg-red-700 text-white font-bold text-base md:text-lg rounded-2xl shadow-lg"
-              onClick={() => navigate("/delete-account")}
+              onClick={() => navigate("/deleteaccount")}
             >
               <Trash2 className="w-5 h-5 mr-2" />
               حذف الحساب نهائياً
