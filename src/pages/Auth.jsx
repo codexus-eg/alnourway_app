@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Loader2 } from "lucide-react";
-// ✅ استدعاء المكتبة الجديدة المتوافقة مع إصدارك
 import { SocialLogin } from "@capgo/capacitor-social-login";
 import { SignInWithApple } from "@capacitor-community/apple-sign-in";
 import { Capacitor } from "@capacitor/core";
@@ -21,7 +20,6 @@ export default function AuthPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // تهيئة جوجل باستخدام المكتبة الجديدة والمفاتيح الخاصة بك
     if (Capacitor.isNativePlatform()) {
       SocialLogin.initialize({
         google: {
@@ -49,8 +47,14 @@ export default function AuthPage() {
       }
 
       if (provider === "google") {
-        const googleUser = await SocialLogin.login({ provider: "google" });
-        // المكتبة بترجع الـ idToken جوه result
+        // ✅ التعديل هنا: إضافة الـ options الإجبارية اللي كانت ناقصة
+        const googleUser = await SocialLogin.login({
+          provider: "google",
+          options: {
+            scopes: ["email", "profile"],
+          },
+        });
+
         if (googleUser.result && googleUser.result.idToken) {
           const { error } = await supabase.auth.signInWithIdToken({
             provider: "google",
