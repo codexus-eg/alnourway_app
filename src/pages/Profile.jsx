@@ -4,11 +4,34 @@ import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Settings, LogOut, Heart, BookOpen, Bell, Mail, Shield, Search, Sparkles, Video, FileText, Activity, Save } from "lucide-react";
+import {
+  User,
+  Settings,
+  LogOut,
+  Heart,
+  BookOpen,
+  Bell,
+  Mail,
+  Shield,
+  Search,
+  Sparkles,
+  Video,
+  FileText,
+  Activity,
+  Save,
+  Trash2,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
+
 export default function Profile() {
   const { t, language, changeLanguage } = useLanguage();
   const [user, setUser] = useState(null);
@@ -23,34 +46,37 @@ export default function Profile() {
 
   const loadUser = async () => {
     try {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
       if (authUser) {
-        setUser({ ...authUser, role: 'user' });
+        setUser({ ...authUser, role: "user" });
 
         // Load stats
         const { data: preferenceData } = await supabase
-          .from('UserPreference')
-          .select('*')
-          .eq('user_email', authUser.email)
+          .from("UserPreference")
+          .select("*")
+          .eq("user_email", authUser.email)
           .single();
 
         if (preferenceData) {
           setInterests(preferenceData.interested_topics || []);
           const history = preferenceData.view_history || [];
           setStats({
-            lectures: history.filter(h => h.content_type === 'lecture').length,
-            stories: history.filter(h => h.content_type === 'story').length,
-            fatwas: 0 // Will fetch from FatwaRequest
+            lectures: history.filter((h) => h.content_type === "lecture")
+              .length,
+            stories: history.filter((h) => h.content_type === "story").length,
+            fatwas: 0, // Will fetch from FatwaRequest
           });
         }
 
         // Fetch fatwa requests count
         const { count: fatwaCount } = await supabase
-          .from('FatwaRequest')
-          .select('*', { count: 'exact' })
-          .eq('email', authUser.email);
+          .from("FatwaRequest")
+          .select("*", { count: "exact" })
+          .eq("email", authUser.email);
 
-        setStats(prev => ({ ...prev, fatwas: fatwaCount || 0 }));
+        setStats((prev) => ({ ...prev, fatwas: fatwaCount || 0 }));
       }
     } catch (error) {
       console.error("Error loading user:", error);
@@ -61,27 +87,45 @@ export default function Profile() {
   const handleSavePreferences = async () => {
     if (!user) return;
     try {
-      const { error } = await supabase.from('UserPreference').upsert({
-        user_email: user.email,
-        interested_topics: interests
-      }, { onConflict: 'user_email' });
+      const { error } = await supabase.from("UserPreference").upsert(
+        {
+          user_email: user.email,
+          interested_topics: interests,
+        },
+        { onConflict: "user_email" },
+      );
 
       if (error) throw error;
-      alert(t('success'));
+      alert(t("success"));
     } catch (e) {
-      alert(t('error'));
+      alert(t("error"));
     }
   };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    window.location.href = '/';
+    window.location.href = "/";
   };
 
   const menuItems = [
-    { icon: Heart, label: "المفضلة", color: "from-red-400 to-red-600", link: createPageUrl("Favorites") },
-    { icon: Search, label: "البحث", color: "from-indigo-400 to-indigo-600", link: createPageUrl("Search") },
-    { icon: Settings, label: "الإعدادات", color: "from-gray-400 to-gray-600", link: createPageUrl("Settings") },
+    {
+      icon: Heart,
+      label: "المفضلة",
+      color: "from-red-400 to-red-600",
+      link: createPageUrl("Favorites"),
+    },
+    {
+      icon: Search,
+      label: "البحث",
+      color: "from-indigo-400 to-indigo-600",
+      link: createPageUrl("Search"),
+    },
+    {
+      icon: Settings,
+      label: "الإعدادات",
+      color: "from-gray-400 to-gray-600",
+      link: createPageUrl("Settings"),
+    },
   ];
 
   if (loading) {
@@ -93,7 +137,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-700 via-purple-600 to-indigo-800">
+    <div className="min-h-screen bg-gradient-to-br from-purple-700 via-purple-600 to-indigo-800 pb-32">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -112,13 +156,17 @@ export default function Profile() {
           {user ? (
             <>
               <h1 className="text-2xl md:text-4xl font-bold mb-2 md:mb-3">
-                {user.email ? user.email.split('@')[0] : "User"}
+                {user.email ? user.email.split("@")[0] : "User"}
               </h1>
-              <p className="text-purple-100 text-base md:text-lg mb-2">{user.email}</p>
+              <p className="text-purple-100 text-base md:text-lg mb-2">
+                {user.email}
+              </p>
             </>
           ) : (
             <>
-              <h1 className="text-2xl md:text-4xl font-bold mb-3">{t('login')}</h1>
+              <h1 className="text-2xl md:text-4xl font-bold mb-3">
+                {t("login")}
+              </h1>
             </>
           )}
         </div>
@@ -128,27 +176,37 @@ export default function Profile() {
         <div className="max-w-3xl mx-auto px-4 py-6 md:py-8">
           {/* Statistics Section */}
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-white mb-4 px-2">{t('statistics')}</h2>
+            <h2 className="text-xl font-bold text-white mb-4 px-2">
+              {t("statistics")}
+            </h2>
             <div className="grid grid-cols-3 gap-4">
               <Card className="border-0 shadow-lg bg-white/95 backdrop-blur-sm rounded-2xl">
                 <CardContent className="p-4 text-center">
                   <Video className="w-8 h-8 text-purple-500 mx-auto mb-2" />
-                  <h3 className="text-2xl font-bold text-gray-900">{stats.lectures}</h3>
-                  <p className="text-xs text-gray-500">{t('watched_lectures')}</p>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {stats.lectures}
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    {t("watched_lectures")}
+                  </p>
                 </CardContent>
               </Card>
               <Card className="border-0 shadow-lg bg-white/95 backdrop-blur-sm rounded-2xl">
                 <CardContent className="p-4 text-center">
                   <BookOpen className="w-8 h-8 text-amber-500 mx-auto mb-2" />
-                  <h3 className="text-2xl font-bold text-gray-900">{stats.stories}</h3>
-                  <p className="text-xs text-gray-500">{t('read_stories')}</p>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {stats.stories}
+                  </h3>
+                  <p className="text-xs text-gray-500">{t("read_stories")}</p>
                 </CardContent>
               </Card>
               <Card className="border-0 shadow-lg bg-white/95 backdrop-blur-sm rounded-2xl">
                 <CardContent className="p-4 text-center">
                   <FileText className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
-                  <h3 className="text-2xl font-bold text-gray-900">{stats.fatwas}</h3>
-                  <p className="text-xs text-gray-500">{t('asked_fatwas')}</p>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {stats.fatwas}
+                  </h3>
+                  <p className="text-xs text-gray-500">{t("asked_fatwas")}</p>
                 </CardContent>
               </Card>
             </div>
@@ -156,11 +214,15 @@ export default function Profile() {
 
           {/* Preferences Section */}
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-white mb-4 px-2">{t('edit_preferences')}</h2>
+            <h2 className="text-xl font-bold text-white mb-4 px-2">
+              {t("edit_preferences")}
+            </h2>
             <Card className="border-0 shadow-lg bg-white/95 backdrop-blur-sm rounded-3xl">
               <CardContent className="p-6 space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">{t('language')}</label>
+                  <label className="text-sm font-medium text-gray-700">
+                    {t("language")}
+                  </label>
                   <Select value={language} onValueChange={changeLanguage}>
                     <SelectTrigger>
                       <SelectValue />
@@ -175,22 +237,33 @@ export default function Profile() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">{t('interests')}</label>
+                  <label className="text-sm font-medium text-gray-700">
+                    {t("interests")}
+                  </label>
                   <div className="flex flex-wrap gap-2">
-                    {['quran', 'hadith', 'fiqh', 'tafsir', 'aqeedah', 'seerah', 'azkar'].map(topic => (
+                    {[
+                      "quran",
+                      "hadith",
+                      "fiqh",
+                      "tafsir",
+                      "aqeedah",
+                      "seerah",
+                      "azkar",
+                    ].map((topic) => (
                       <button
                         key={topic}
                         onClick={() => {
                           if (interests.includes(topic)) {
-                            setInterests(interests.filter(i => i !== topic));
+                            setInterests(interests.filter((i) => i !== topic));
                           } else {
                             setInterests([...interests, topic]);
                           }
                         }}
-                        className={`px-3 py-1 rounded-full text-sm transition-all ${interests.includes(topic)
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                          }`}
+                        className={`px-3 py-1 rounded-full text-sm transition-all ${
+                          interests.includes(topic)
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
                       >
                         {topic}
                       </button>
@@ -198,9 +271,12 @@ export default function Profile() {
                   </div>
                 </div>
 
-                <Button onClick={handleSavePreferences} className="w-full bg-purple-600 hover:bg-purple-700">
+                <Button
+                  onClick={handleSavePreferences}
+                  className="w-full bg-purple-600 hover:bg-purple-700"
+                >
                   <Save className="w-4 h-4 mr-2" />
-                  {t('save_changes')}
+                  {t("save_changes")}
                 </Button>
               </CardContent>
             </Card>
@@ -219,8 +295,10 @@ export default function Profile() {
                       <Mail className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">{t('email')}</p>
-                      <p className="font-semibold text-gray-900 text-sm md:text-base">{user.email}</p>
+                      <p className="text-sm text-gray-500">{t("email")}</p>
+                      <p className="font-semibold text-gray-900 text-sm md:text-base">
+                        {user.email}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -238,9 +316,11 @@ export default function Profile() {
                       <Shield className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">{t('account_type')}</p>
+                      <p className="text-sm text-gray-500">
+                        {t("account_type")}
+                      </p>
                       <p className="font-semibold text-gray-900 text-sm md:text-base">
-                        {user.role === 'admin' ? 'Admin' : 'User'}
+                        {user.role === "admin" ? "Admin" : "User"}
                       </p>
                     </div>
                   </div>
@@ -249,19 +329,29 @@ export default function Profile() {
             </motion.div>
           </div>
 
-          {/* Logout Button */}
+          {/* Action Buttons: Logout & Delete Account */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
+            className="space-y-4"
           >
             <Button
               variant="outline"
-              className="w-full py-5 md:py-6 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 text-base md:text-lg bg-white/95 backdrop-blur-sm rounded-2xl"
+              className="w-full py-5 md:py-6 text-gray-700 border-gray-300 hover:bg-gray-50 text-base md:text-lg bg-white/95 backdrop-blur-sm rounded-2xl"
               onClick={handleLogout}
             >
-              <LogOut className="w-5 h-5 ml-2" />
-              {t('logout')}
+              <LogOut className="w-5 h-5 mr-2" />
+              {t("logout")}
+            </Button>
+
+            <Button
+              variant="destructive"
+              className="w-full py-5 md:py-6 bg-red-600 hover:bg-red-700 text-white font-bold text-base md:text-lg rounded-2xl shadow-lg"
+              onClick={() => navigate("/delete-account")}
+            >
+              <Trash2 className="w-5 h-5 mr-2" />
+              حذف الحساب نهائياً
             </Button>
           </motion.div>
         </div>
@@ -271,16 +361,14 @@ export default function Profile() {
             <CardContent className="p-8 md:p-12">
               <User className="w-16 h-16 text-gray-300 mx-auto mb-6" />
               <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
-                {t('please_login_to_access_account')}
+                {t("please_login_to_access_account")}
               </h3>
               <p className="text-gray-600 mb-8">
-                {t('login_to_view_stats_and_preferences')}
+                {t("login_to_view_stats_and_preferences")}
               </p>
               <Link to="/auth">
-                <Button
-                  className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 py-5 md:py-6 text-base md:text-lg rounded-2xl"
-                >
-                  {t('login')}
+                <Button className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 py-5 md:py-6 text-base md:text-lg rounded-2xl">
+                  {t("login")}
                 </Button>
               </Link>
             </CardContent>
